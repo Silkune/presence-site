@@ -120,8 +120,10 @@
     
     #content.visible { opacity: 1; }
     
+    /* Section bougies - prend tout l'écran pour permettre la dispersion */
     #candle-section {
         min-height: 100vh;
+        position: relative;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -145,19 +147,23 @@
         font-style: italic;
         text-shadow: 0 0 8px rgba(0,0,0,0.9);
         text-align: center;
+        z-index: 10;
+        position: relative;
     }
     
-    #candle {
+    /* Bougie centrale (celle de l'utilisateur) */
+    #my-candle {
         width: 60px;
         height: 120px;
         position: relative;
         cursor: pointer;
         transition: transform 0.5s ease;
+        z-index: 10;
     }
     
-    #candle:hover { transform: scale(1.05); }
-    #candle.lit-already { cursor: default; }
-    #candle.lit-already:hover { transform: scale(1); }
+    #my-candle:hover { transform: scale(1.05); }
+    #my-candle.lit-already { cursor: default; }
+    #my-candle.lit-already:hover { transform: scale(1); }
     
     #candle-body {
         position: absolute;
@@ -203,6 +209,54 @@
         100% { transform: translateX(-50%) scale(1.05) rotate(1deg); }
     }
     
+    /* Champ de bougies des autres */
+    #candle-field {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 5;
+    }
+    
+    .other-candle {
+        position: absolute;
+        opacity: 0;
+        animation: candleAppear 3s ease forwards;
+    }
+    
+    @keyframes candleAppear {
+        from { opacity: 0; transform: scale(0.5); }
+        to { opacity: 1; transform: scale(1); }
+    }
+    
+    .other-candle .body {
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(to bottom, #d4c4a1, #a99876);
+        border-radius: 2px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.4);
+    }
+    
+    .other-candle .wick {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #2a2a2a;
+    }
+    
+    .other-candle .flame {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        background: radial-gradient(ellipse at center bottom, #fff5a3 0%, #ffaa00 40%, #ff6600 80%, transparent 100%);
+        border-radius: 50% 50% 30% 30%;
+        animation: flicker 0.18s infinite alternate;
+    }
+    
     #candle-count {
         margin-top: 3em;
         font-size: 0.85em;
@@ -210,8 +264,11 @@
         letter-spacing: 0.2em;
         font-style: italic;
         text-align: center;
+        z-index: 10;
+        position: relative;
     }
     
+    /* Livre d'or */
     #guestbook-section {
         min-height: 100vh;
         display: flex;
@@ -356,8 +413,10 @@
 <div id="content">
     
     <section id="candle-section" data-act>
+        <div id="candle-field"></div>
+        
         <div id="candle-prompt">light a candle</div>
-        <div id="candle" onclick="lightCandle()">
+        <div id="my-candle" onclick="lightCandle()">
             <div id="candle-body"></div>
             <div id="wick"></div>
             <div id="flame"></div>
@@ -406,7 +465,7 @@
             try {
                 await updateDoc(ref, { visits: increment(1) });
             } catch (e) {
-                await setDoc(ref, { visits: 1, candles: 0 });
+                await setDoc(ref, { visits: 1 });
             }
         },
         async getVisits() {
@@ -414,18 +473,18 @@
             const snap = await getDoc(ref);
             return snap.exists() ? (snap.data().visits || 0) : 0;
         },
-        async getCandles() {
-            const ref = doc(db, "stats", "counters");
-            const snap = await getDoc(ref);
-            return snap.exists() ? (snap.data().candles || 0) : 0;
+        async addCandle() {
+            // Crée un nouveau document dans la collection candles avec son timestamp
+            const docRef = await addDoc(collection(db, "candles"), {
+                ts: serverTimestamp()
+            });
+            return docRef.id;
         },
-        async lightCandle() {
-            const ref = doc(db, "stats", "counters");
-            try {
-                await updateDoc(ref, { candles: increment(1) });
-            } catch (e) {
-                await setDoc(ref, { candles: 1, visits: 0 });
-            }
+        async getCandles() {
+            // Récupère toutes les bougies (jusqu'à 200 pour limiter)
+            const q = query(collection(db, "candles"), orderBy("ts", "desc"), limit(200));
+            const snap = await getDocs(q);
+            return snap.docs.map(d => d.id);
         },
         async addMessage(text) {
             await addDoc(collection(db, "messages"), {
@@ -446,6 +505,7 @@
 
 <script>
     let started = false;
+    let myCandleId = localStorage.getItem('memorial_candle_id') || null;
     
     document.addEventListener('fbready', async () => {
         await window.fb.incrementVisits();
@@ -467,7 +527,7 @@
             document.getElementById('content').classList.add('visible');
             startShootingStars();
             loadMessages();
-            updateCandleCount();
+            loadCandles();
             checkAlreadyLit();
         }, 3000);
         setTimeout(() => {
@@ -520,34 +580,135 @@
         setTimeout(() => star.remove(), duration);
     }
     
+    // Génère un nombre pseudo-aléatoire déterministe à partir d'une seed string
+    function seededRandom(seed) {
+        let h = 0;
+        for (let i = 0; i < seed.length; i++) {
+            h = ((h << 5) - h) + seed.charCodeAt(i);
+            h |= 0;
+        }
+        // Convertit en valeur entre 0 et 1
+        return Math.abs(Math.sin(h)) % 1;
+    }
+    
+    function seededRandom2(seed, offset) {
+        return seededRandom(seed + offset);
+    }
+    
     function checkAlreadyLit() {
-        if (localStorage.getItem('memorial_lit') === 'yes') {
+        if (myCandleId) {
             document.getElementById('flame').classList.add('lit');
-            document.getElementById('candle').classList.add('lit-already');
+            document.getElementById('my-candle').classList.add('lit-already');
             document.getElementById('candle-prompt').textContent = 'your flame is lit.';
         }
     }
     
     async function lightCandle() {
-        if (localStorage.getItem('memorial_lit') === 'yes') return;
+        if (myCandleId) return;
         
         const flame = document.getElementById('flame');
         flame.classList.add('lit');
-        document.getElementById('candle').classList.add('lit-already');
+        document.getElementById('my-candle').classList.add('lit-already');
         document.getElementById('candle-prompt').textContent = 'your flame is lit.';
         
-        localStorage.setItem('memorial_lit', 'yes');
+        // Crée la bougie dans Firebase
+        const newId = await window.fb.addCandle();
+        myCandleId = newId;
+        localStorage.setItem('memorial_candle_id', newId);
         
-        await window.fb.lightCandle();
-        updateCandleCount();
+        // Recharge le champ de bougies
+        loadCandles();
     }
     
-    async function updateCandleCount() {
-        const count = await window.fb.getCandles();
+    async function loadCandles() {
+        const candleIds = await window.fb.getCandles();
+        const field = document.getElementById('candle-field');
+        field.innerHTML = '';
+        
+        // Filtre pour ne pas afficher la propre bougie de l'utilisateur dans le champ
+        const others = candleIds.filter(id => id !== myCandleId);
+        
+        // Compteur affiché
+        const total = candleIds.length;
         const el = document.getElementById('candle-count');
-        if (count === 0) el.textContent = '— —';
-        else if (count === 1) el.textContent = 'one flame lit';
-        else el.textContent = count + ' flames lit';
+        if (total === 0) el.textContent = '— —';
+        else if (total === 1) el.textContent = 'one flame lit';
+        else el.textContent = total + ' flames lit';
+        
+        // Ne dessine les autres bougies QUE si l'utilisateur a allumé la sienne
+        if (!myCandleId) return;
+        
+        // Dimensions du conteneur
+        const section = document.getElementById('candle-section');
+        const rect = section.getBoundingClientRect();
+        const w = rect.width;
+        const h = rect.height;
+        const centerX = w / 2;
+        const centerY = h / 2;
+        const exclusionRadius = 120; // zone autour de la bougie centrale à éviter
+        
+        others.forEach((id, index) => {
+            // Position déterministe basée sur l'ID
+            let x, y, attempts = 0;
+            do {
+                const rx = seededRandom2(id, 'x' + attempts);
+                const ry = seededRandom2(id, 'y' + attempts);
+                x = rx * w;
+                y = ry * h;
+                attempts++;
+            } while (
+                Math.hypot(x - centerX, y - centerY) < exclusionRadius && attempts < 20
+            );
+            
+            // Taille variable (plus petite que la centrale, varie entre 40% et 70%)
+            const scale = 0.4 + seededRandom2(id, 'scale') * 0.3;
+            
+            // Délai d'apparition échelonné
+            const delay = Math.min(index * 80, 3000);
+            
+            const candle = createSmallCandle(scale);
+            candle.style.left = x + 'px';
+            candle.style.top = y + 'px';
+            candle.style.animationDelay = delay + 'ms';
+            field.appendChild(candle);
+        });
+    }
+    
+    function createSmallCandle(scale) {
+        const baseW = 28;
+        const baseH = 80;
+        const wickH = 8;
+        const flameW = 14;
+        const flameH = 24;
+        
+        const candle = document.createElement('div');
+        candle.className = 'other-candle';
+        candle.style.width = (60 * scale) + 'px';
+        candle.style.height = (120 * scale) + 'px';
+        
+        const body = document.createElement('div');
+        body.className = 'body';
+        body.style.width = (baseW * scale) + 'px';
+        body.style.height = (baseH * scale) + 'px';
+        body.style.borderRadius = (2 * scale) + 'px';
+        candle.appendChild(body);
+        
+        const wick = document.createElement('div');
+        wick.className = 'wick';
+        wick.style.width = (2 * scale) + 'px';
+        wick.style.height = (wickH * scale) + 'px';
+        wick.style.top = ((120 * scale) - (baseH * scale) - (wickH * scale)) + 'px';
+        candle.appendChild(wick);
+        
+        const flame = document.createElement('div');
+        flame.className = 'flame';
+        flame.style.width = (flameW * scale) + 'px';
+        flame.style.height = (flameH * scale) + 'px';
+        flame.style.top = ((120 * scale) - (baseH * scale) - (wickH * scale) - (flameH * scale)) + 'px';
+        flame.style.boxShadow = `0 0 ${30 * scale}px rgba(255,170,0,0.5), 0 0 ${60 * scale}px rgba(255,140,0,0.25)`;
+        candle.appendChild(flame);
+        
+        return candle;
     }
     
     async function loadMessages() {
