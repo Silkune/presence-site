@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>...</title>
+<style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+        background: #000;
+        cursor: default;
+    }
+    
+    #bg {
+        position: fixed;
+        top: -20px;
+        left: -20px;
+        width: calc(100vw + 40px);
+        height: calc(100vh + 40px);
+        background-image: url('starry-night.jpg');
+        background-size: cover;
+        background-position: center;
+        z-index: 1;
+        filter: blur(8px) brightness(0.55);
+    }
+    
+    #vignette {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.7) 100%);
+        z-index: 2;
+        pointer-events: none;
+    }
+    
+    #text {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80%;
+        max-width: 900px;
+        color: #fff;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 1.15em;
+        line-height: 2.2em;
+        text-align: center;
+        font-weight: 300;
+        letter-spacing: 0.05em;
+        z-index: 3;
+        text-shadow: 
+            0 0 4px rgba(0,0,0,0.9),
+            0 0 12px rgba(0,0,0,0.8),
+            0 2px 6px rgba(0,0,0,1);
+        opacity: 0;
+        transition: opacity 3s ease;
+        font-style: italic;
+    }
+    
+    #text.visible {
+        opacity: 1;
+    }
+    
+    #start {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.85);
+        color: #fff;
+        font-family: Georgia, serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+        cursor: pointer;
+        letter-spacing: 0.4em;
+        font-size: 1.2em;
+        font-weight: 300;
+        transition: opacity 1.5s ease;
+    }
+    
+    #start.hidden {
+        opacity: 0;
+        pointer-events: none;
+    }
+</style>
+</head>
+<body>
+
+<div id="bg"></div>
+<div id="vignette"></div>
+
+<div id="text">
+    Time... cruel and fearful...<br><br>
+    A swamp, where one is about to be executed for a crime he did not commit...<br><br>
+    A sea, where a fallen musician can only lament his failure...<br><br>
+    A mountain, where a leader is powerless to save his people...<br><br>
+    A valley, where the ghosts of the past still fight a war that has long since ended...<br><br>
+    A town... caught between it all... where the end begins...<br><br>
+    And one boy... a hero... with all the time in the world... and no time at all... to save this world...
+</div>
+
+<audio id="audio" loop>
+    <source src="song.mp3" type="audio/mpeg">
+</audio>
+
+<div id="start" onclick="play()">enter</div>
+
+<script>
+    function play() {
+        document.getElementById('audio').play();
+        document.getElementById('start').classList.add('hidden');
+        setTimeout(() => {
+            document.getElementById('text').classList.add('visible');
+        }, 1500);
+    }
+</script>
+
+</body>
+</html>
