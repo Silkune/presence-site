@@ -2,16 +2,22 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>...</title>
+<title>memorial</title>
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap');
+    
+    * { box-sizing: border-box; }
+    
     html, body {
         margin: 0;
         padding: 0;
         height: 100%;
         width: 100%;
-        overflow: hidden;
         background: #000;
         cursor: default;
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        color: #fff;
+        overflow-x: hidden;
     }
     
     #bg {
@@ -24,8 +30,12 @@
         background-size: cover;
         background-position: center;
         z-index: 1;
-        filter: blur(8px) brightness(0.55);
+        filter: blur(6px) brightness(0.45);
+        opacity: 0;
+        transition: opacity 6s ease;
     }
+    
+    #bg.visible { opacity: 1; }
     
     #vignette {
         position: fixed;
@@ -33,37 +43,20 @@
         left: 0;
         width: 100vw;
         height: 100vh;
-        background: radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.7) 100%);
+        background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.85) 100%);
         z-index: 2;
         pointer-events: none;
     }
     
-    #text {
+    .shooting-star {
         position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 80%;
-        max-width: 900px;
-        color: #fff;
-        font-family: Georgia, "Times New Roman", serif;
-        font-size: 1.15em;
-        line-height: 2.2em;
-        text-align: center;
-        font-weight: 300;
-        letter-spacing: 0.05em;
+        width: 2px;
+        height: 2px;
+        background: linear-gradient(45deg, rgba(255,255,255,0), rgba(255,255,255,0.9));
+        border-radius: 50%;
+        box-shadow: 0 0 6px rgba(255,255,255,0.8);
         z-index: 3;
-        text-shadow: 
-            0 0 4px rgba(0,0,0,0.9),
-            0 0 12px rgba(0,0,0,0.8),
-            0 2px 6px rgba(0,0,0,1);
-        opacity: 0;
-        transition: opacity 3s ease;
-        font-style: italic;
-    }
-    
-    #text.visible {
-        opacity: 1;
+        pointer-events: none;
     }
     
     #start {
@@ -72,23 +65,340 @@
         left: 0;
         width: 100vw;
         height: 100vh;
-        background: rgba(0, 0, 0, 0.85);
-        color: #fff;
-        font-family: Georgia, serif;
+        background: #000;
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
-        z-index: 10;
+        z-index: 100;
         cursor: pointer;
-        letter-spacing: 0.4em;
-        font-size: 1.2em;
-        font-weight: 300;
-        transition: opacity 1.5s ease;
+        transition: opacity 3s ease;
     }
     
     #start.hidden {
         opacity: 0;
         pointer-events: none;
+    }
+    
+    #start-text {
+        color: rgba(255,255,255,0.7);
+        font-size: 1em;
+        letter-spacing: 0.5em;
+        font-weight: 300;
+        animation: breathe 4s ease-in-out infinite;
+    }
+    
+    #start-subtitle {
+        color: rgba(255,255,255,0.3);
+        font-size: 0.75em;
+        letter-spacing: 0.3em;
+        margin-top: 2em;
+        font-style: italic;
+    }
+    
+    #visitor-count {
+        position: absolute;
+        bottom: 2em;
+        color: rgba(255,255,255,0.2);
+        font-size: 0.7em;
+        letter-spacing: 0.3em;
+        font-style: italic;
+    }
+    
+    @keyframes breathe {
+        0%, 100% { opacity: 0.4; }
+        50% { opacity: 1; }
+    }
+    
+    #content {
+        position: relative;
+        z-index: 5;
+        width: 100%;
+        opacity: 0;
+        transition: opacity 4s ease;
+    }
+    
+    #content.visible { opacity: 1; }
+    
+    .act {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4em 2em;
+        opacity: 0;
+        transform: translateY(40px);
+        transition: opacity 2.5s ease, transform 2.5s ease;
+    }
+    
+    .act.revealed {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .act-inner {
+        max-width: 700px;
+        text-align: center;
+        font-size: 1.3em;
+        line-height: 2.4em;
+        font-weight: 300;
+        font-style: italic;
+        letter-spacing: 0.04em;
+        text-shadow: 
+            0 0 6px rgba(0,0,0,0.95),
+            0 0 16px rgba(0,0,0,0.85),
+            0 2px 8px rgba(0,0,0,1);
+    }
+    
+    .act-title {
+        font-style: normal;
+        font-size: 0.7em;
+        letter-spacing: 0.6em;
+        color: rgba(255,255,255,0.5);
+        margin-bottom: 3em;
+        text-transform: uppercase;
+    }
+    
+    #candle-section {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 4em 2em;
+        opacity: 0;
+        transform: translateY(40px);
+        transition: opacity 2.5s ease, transform 2.5s ease;
+    }
+    
+    #candle-section.revealed {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    #candle-prompt {
+        font-size: 1em;
+        letter-spacing: 0.3em;
+        color: rgba(255,255,255,0.6);
+        margin-bottom: 2em;
+        font-style: italic;
+        text-shadow: 0 0 8px rgba(0,0,0,0.9);
+        text-align: center;
+    }
+    
+    #candle {
+        width: 60px;
+        height: 120px;
+        position: relative;
+        cursor: pointer;
+        transition: transform 0.5s ease;
+    }
+    
+    #candle:hover { transform: scale(1.05); }
+    #candle.lit-already { cursor: default; }
+    #candle.lit-already:hover { transform: scale(1); }
+    
+    #candle-body {
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 28px;
+        height: 80px;
+        background: linear-gradient(to bottom, #f4e4c1, #c9a876);
+        border-radius: 2px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+    
+    #wick {
+        position: absolute;
+        top: 22px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 2px;
+        height: 8px;
+        background: #2a2a2a;
+    }
+    
+    #flame {
+        position: absolute;
+        top: 0px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 14px;
+        height: 24px;
+        background: radial-gradient(ellipse at center bottom, #fff5a3 0%, #ffaa00 40%, #ff6600 80%, transparent 100%);
+        border-radius: 50% 50% 30% 30%;
+        opacity: 0;
+        transition: opacity 1.5s ease;
+        animation: flicker 0.15s infinite alternate;
+        box-shadow: 0 0 40px rgba(255,170,0,0.6), 0 0 80px rgba(255,140,0,0.3);
+    }
+    
+    #flame.lit { opacity: 1; }
+    
+    @keyframes flicker {
+        0% { transform: translateX(-50%) scale(1) rotate(-1deg); }
+        100% { transform: translateX(-50%) scale(1.05) rotate(1deg); }
+    }
+    
+    #candle-count {
+        margin-top: 3em;
+        font-size: 0.85em;
+        color: rgba(255,255,255,0.5);
+        letter-spacing: 0.2em;
+        font-style: italic;
+        text-align: center;
+    }
+    
+    #guestbook-section {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 4em 2em;
+        opacity: 0;
+        transform: translateY(40px);
+        transition: opacity 2.5s ease, transform 2.5s ease;
+    }
+    
+    #guestbook-section.revealed {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    #guestbook-title {
+        font-size: 0.7em;
+        letter-spacing: 0.6em;
+        color: rgba(255,255,255,0.5);
+        margin-bottom: 2em;
+        text-transform: uppercase;
+    }
+    
+    #guestbook-prompt {
+        font-size: 1em;
+        font-style: italic;
+        color: rgba(255,255,255,0.7);
+        margin-bottom: 2em;
+        text-align: center;
+        text-shadow: 0 0 8px rgba(0,0,0,0.9);
+    }
+    
+    #message-input {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: #fff;
+        font-family: inherit;
+        font-size: 1.1em;
+        font-style: italic;
+        padding: 1em 1.5em;
+        width: 90%;
+        max-width: 500px;
+        text-align: center;
+        outline: none;
+        transition: border-color 0.5s ease, background 0.5s ease;
+    }
+    
+    #message-input:focus {
+        border-color: rgba(255,255,255,0.5);
+        background: rgba(255,255,255,0.08);
+    }
+    
+    #message-input::placeholder {
+        color: rgba(255,255,255,0.3);
+    }
+    
+    #submit-btn {
+        margin-top: 1.5em;
+        background: transparent;
+        border: 1px solid rgba(255,255,255,0.3);
+        color: rgba(255,255,255,0.7);
+        padding: 0.8em 2.5em;
+        font-family: inherit;
+        letter-spacing: 0.3em;
+        cursor: pointer;
+        font-size: 0.85em;
+        transition: all 0.5s ease;
+    }
+    
+    #submit-btn:hover {
+        background: rgba(255,255,255,0.1);
+        color: #fff;
+        border-color: rgba(255,255,255,0.6);
+    }
+    
+    #messages-display {
+        margin-top: 4em;
+        max-width: 600px;
+        width: 100%;
+        text-align: center;
+    }
+    
+    .past-message {
+        font-style: italic;
+        color: rgba(255,255,255,0.5);
+        font-size: 1em;
+        margin: 1.5em 0;
+        line-height: 1.8em;
+        animation: fadeIn 3s ease;
+        text-shadow: 0 0 8px rgba(0,0,0,0.9);
+    }
+    
+    .past-message::before {
+        content: '— ';
+        color: rgba(255,255,255,0.3);
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    #ending {
+        min-height: 60vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4em 2em;
+        opacity: 0;
+        transform: translateY(40px);
+        transition: opacity 2.5s ease, transform 2.5s ease;
+    }
+    
+    #ending.revealed {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    #ending-text {
+        font-size: 0.9em;
+        letter-spacing: 0.4em;
+        color: rgba(255,255,255,0.4);
+        text-align: center;
+        font-style: italic;
+        line-height: 2em;
+    }
+    
+    #scroll-hint {
+        position: fixed;
+        bottom: 2em;
+        left: 50%;
+        transform: translateX(-50%);
+        color: rgba(255,255,255,0.4);
+        font-size: 0.7em;
+        letter-spacing: 0.4em;
+        z-index: 50;
+        animation: float 3s ease-in-out infinite;
+        pointer-events: none;
+        transition: opacity 1s ease;
+    }
+    
+    #scroll-hint.hidden { opacity: 0; }
+    
+    @keyframes float {
+        0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.4; }
+        50% { transform: translateX(-50%) translateY(8px); opacity: 0.8; }
     }
 </style>
 </head>
@@ -97,30 +407,301 @@
 <div id="bg"></div>
 <div id="vignette"></div>
 
-<div id="text">
-    Time... cruel and fearful...<br><br>
-    A swamp, where one is about to be executed for a crime he did not commit...<br><br>
-    A sea, where a fallen musician can only lament his failure...<br><br>
-    A mountain, where a leader is powerless to save his people...<br><br>
-    A valley, where the ghosts of the past still fight a war that has long since ended...<br><br>
-    A town... caught between it all... where the end begins...<br><br>
-    And one boy... a hero... with all the time in the world... and no time at all... to save this world...
-</div>
-
 <audio id="audio" loop>
     <source src="song.mp3" type="audio/mpeg">
 </audio>
 
-<div id="start" onclick="play()">enter</div>
+<div id="start" onclick="begin()">
+    <div id="start-text">enter</div>
+    <div id="start-subtitle">in memory of all that was</div>
+    <div id="visitor-count"></div>
+</div>
+
+<div id="content">
+    
+    <section class="act" data-act>
+        <div class="act-inner">
+            <div class="act-title">i. the swamp</div>
+            where one is about to be executed<br>
+            for a crime he did not commit.
+        </div>
+    </section>
+    
+    <section class="act" data-act>
+        <div class="act-inner">
+            <div class="act-title">ii. the sea</div>
+            where a fallen musician<br>
+            can only lament his failure.
+        </div>
+    </section>
+    
+    <section class="act" data-act>
+        <div class="act-inner">
+            <div class="act-title">iii. the mountain</div>
+            where a leader is powerless<br>
+            to save his people.
+        </div>
+    </section>
+    
+    <section class="act" data-act>
+        <div class="act-inner">
+            <div class="act-title">iv. the valley</div>
+            where the ghosts of the past<br>
+            still fight a war<br>
+            that has long since ended.
+        </div>
+    </section>
+    
+    <section class="act" data-act>
+        <div class="act-inner">
+            <div class="act-title">v. the town</div>
+            caught between it all,<br>
+            where the end begins.
+        </div>
+    </section>
+    
+    <section id="candle-section" data-act>
+        <div id="candle-prompt">light a candle</div>
+        <div id="candle" onclick="lightCandle()">
+            <div id="candle-body"></div>
+            <div id="wick"></div>
+            <div id="flame"></div>
+        </div>
+        <div id="candle-count">— —</div>
+    </section>
+    
+    <section id="guestbook-section" data-act>
+        <div id="guestbook-title">leave a word</div>
+        <div id="guestbook-prompt">
+            something you carry,<br>
+            something you wish to set down.
+        </div>
+        <input type="text" id="message-input" placeholder="..." maxlength="120">
+        <button id="submit-btn" onclick="submitMessage()">offer</button>
+        <div id="messages-display"></div>
+    </section>
+    
+    <section id="ending" data-act>
+        <div id="ending-text">
+            and one boy, a hero,<br>
+            with all the time in the world,<br>
+            and no time at all,<br>
+            to save this world.
+        </div>
+    </section>
+    
+</div>
+
+<div id="scroll-hint">↓ scroll</div>
+
+<!-- Firebase -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { 
+        getFirestore, doc, getDoc, setDoc, updateDoc, increment, 
+        collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp 
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyC6b2nxDqxkqaDGgA2-5eKj-5wPDqjX9eM",
+        authDomain: "memori-6c43c.firebaseapp.com",
+        projectId: "memori-6c43c",
+        storageBucket: "memori-6c43c.firebasestorage.app",
+        messagingSenderId: "392237000378",
+        appId: "1:392237000378:web:3a27b402dda73453374483"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    
+    window.fb = {
+        async incrementVisits() {
+            const ref = doc(db, "stats", "counters");
+            try {
+                await updateDoc(ref, { visits: increment(1) });
+            } catch (e) {
+                await setDoc(ref, { visits: 1, candles: 0 });
+            }
+        },
+        async getVisits() {
+            const ref = doc(db, "stats", "counters");
+            const snap = await getDoc(ref);
+            return snap.exists() ? (snap.data().visits || 0) : 0;
+        },
+        async getCandles() {
+            const ref = doc(db, "stats", "counters");
+            const snap = await getDoc(ref);
+            return snap.exists() ? (snap.data().candles || 0) : 0;
+        },
+        async lightCandle() {
+            const ref = doc(db, "stats", "counters");
+            try {
+                await updateDoc(ref, { candles: increment(1) });
+            } catch (e) {
+                await setDoc(ref, { candles: 1, visits: 0 });
+            }
+        },
+        async addMessage(text) {
+            await addDoc(collection(db, "messages"), {
+                text: text,
+                ts: serverTimestamp()
+            });
+        },
+        async getMessages() {
+            const q = query(collection(db, "messages"), orderBy("ts", "desc"), limit(20));
+            const snap = await getDocs(q);
+            return snap.docs.map(d => d.data().text);
+        }
+    };
+    
+    window.fbReady = true;
+    document.dispatchEvent(new Event('fbready'));
+</script>
 
 <script>
-    function play() {
+    let started = false;
+    
+    document.addEventListener('fbready', async () => {
+        await window.fb.incrementVisits();
+        const visits = await window.fb.getVisits();
+        document.getElementById('visitor-count').textContent = 
+            visits === 1 ? 'first visitor' : visits + ' have passed through';
+    });
+    
+    function begin() {
+        if (started) return;
+        started = true;
+        
         document.getElementById('audio').play();
         document.getElementById('start').classList.add('hidden');
         setTimeout(() => {
-            document.getElementById('text').classList.add('visible');
-        }, 1500);
+            document.getElementById('bg').classList.add('visible');
+        }, 500);
+        setTimeout(() => {
+            document.getElementById('content').classList.add('visible');
+            startShootingStars();
+            loadMessages();
+            updateCandleCount();
+            checkAlreadyLit();
+        }, 3000);
+        setTimeout(() => {
+            document.getElementById('scroll-hint').classList.add('hidden');
+        }, 12000);
     }
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('revealed');
+            }
+        });
+    }, { threshold: 0.3 });
+    
+    document.querySelectorAll('[data-act]').forEach(act => observer.observe(act));
+    
+    function startShootingStars() {
+        setInterval(() => {
+            if (Math.random() > 0.5) createShootingStar();
+        }, 2500);
+    }
+    
+    function createShootingStar() {
+        const star = document.createElement('div');
+        star.className = 'shooting-star';
+        const startX = Math.random() * window.innerWidth;
+        const startY = Math.random() * window.innerHeight * 0.5;
+        star.style.left = startX + 'px';
+        star.style.top = startY + 'px';
+        
+        const trail = document.createElement('div');
+        trail.style.cssText = 'position:absolute;top:0;left:0;width:80px;height:1px;background:linear-gradient(to left,rgba(255,255,255,0.7),transparent);transform-origin:left center;';
+        star.appendChild(trail);
+        
+        document.body.appendChild(star);
+        
+        const duration = 1200 + Math.random() * 800;
+        const angle = 30 + Math.random() * 20;
+        const distance = 300 + Math.random() * 200;
+        const endX = distance * Math.cos(angle * Math.PI / 180);
+        const endY = distance * Math.sin(angle * Math.PI / 180);
+        
+        star.animate([
+            { transform: 'translate(0, 0)', opacity: 0 },
+            { opacity: 1, offset: 0.2 },
+            { transform: `translate(${endX}px, ${endY}px)`, opacity: 0 }
+        ], { duration: duration, easing: 'ease-out' });
+        
+        setTimeout(() => star.remove(), duration);
+    }
+    
+    function checkAlreadyLit() {
+        if (localStorage.getItem('memorial_lit') === 'yes') {
+            document.getElementById('flame').classList.add('lit');
+            document.getElementById('candle').classList.add('lit-already');
+            document.getElementById('candle-prompt').textContent = 'your flame is lit.';
+        }
+    }
+    
+    async function lightCandle() {
+        if (localStorage.getItem('memorial_lit') === 'yes') return;
+        
+        const flame = document.getElementById('flame');
+        flame.classList.add('lit');
+        document.getElementById('candle').classList.add('lit-already');
+        document.getElementById('candle-prompt').textContent = 'your flame is lit.';
+        
+        localStorage.setItem('memorial_lit', 'yes');
+        
+        await window.fb.lightCandle();
+        updateCandleCount();
+    }
+    
+    async function updateCandleCount() {
+        const count = await window.fb.getCandles();
+        const el = document.getElementById('candle-count');
+        if (count === 0) el.textContent = '— —';
+        else if (count === 1) el.textContent = 'one flame lit';
+        else el.textContent = count + ' flames lit';
+    }
+    
+    async function loadMessages() {
+        const display = document.getElementById('messages-display');
+        display.innerHTML = '';
+        
+        const messages = await window.fb.getMessages();
+        const recent = messages.slice(0, 5);
+        recent.forEach((msg, i) => {
+            setTimeout(() => {
+                const div = document.createElement('div');
+                div.className = 'past-message';
+                div.textContent = msg;
+                display.appendChild(div);
+            }, i * 600);
+        });
+    }
+    
+    async function submitMessage() {
+        const input = document.getElementById('message-input');
+        const msg = input.value.trim();
+        if (msg.length < 2 || msg.length > 120) return;
+        
+        await window.fb.addMessage(msg);
+        
+        input.value = '';
+        input.placeholder = 'offered.';
+        
+        const display = document.getElementById('messages-display');
+        const div = document.createElement('div');
+        div.className = 'past-message';
+        div.textContent = msg;
+        display.insertBefore(div, display.firstChild);
+        
+        setTimeout(() => { input.placeholder = '...'; }, 4000);
+    }
+    
+    document.getElementById('message-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') submitMessage();
+    });
 </script>
 
 </body>
