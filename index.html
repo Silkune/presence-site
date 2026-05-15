@@ -120,45 +120,6 @@
     
     #content.visible { opacity: 1; }
     
-    .act {
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 4em 2em;
-        opacity: 0;
-        transform: translateY(40px);
-        transition: opacity 2.5s ease, transform 2.5s ease;
-    }
-    
-    .act.revealed {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    
-    .act-inner {
-        max-width: 700px;
-        text-align: center;
-        font-size: 1.3em;
-        line-height: 2.4em;
-        font-weight: 300;
-        font-style: italic;
-        letter-spacing: 0.04em;
-        text-shadow: 
-            0 0 6px rgba(0,0,0,0.95),
-            0 0 16px rgba(0,0,0,0.85),
-            0 2px 8px rgba(0,0,0,1);
-    }
-    
-    .act-title {
-        font-style: normal;
-        font-size: 0.7em;
-        letter-spacing: 0.6em;
-        color: rgba(255,255,255,0.5);
-        margin-bottom: 3em;
-        text-transform: uppercase;
-    }
-    
     #candle-section {
         min-height: 100vh;
         display: flex;
@@ -355,31 +316,6 @@
         to { opacity: 1; transform: translateY(0); }
     }
     
-    #ending {
-        min-height: 60vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 4em 2em;
-        opacity: 0;
-        transform: translateY(40px);
-        transition: opacity 2.5s ease, transform 2.5s ease;
-    }
-    
-    #ending.revealed {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    
-    #ending-text {
-        font-size: 0.9em;
-        letter-spacing: 0.4em;
-        color: rgba(255,255,255,0.4);
-        text-align: center;
-        font-style: italic;
-        line-height: 2em;
-    }
-    
     #scroll-hint {
         position: fixed;
         bottom: 2em;
@@ -419,47 +355,6 @@
 
 <div id="content">
     
-    <section class="act" data-act>
-        <div class="act-inner">
-            <div class="act-title">i. the swamp</div>
-            where one is about to be executed<br>
-            for a crime he did not commit.
-        </div>
-    </section>
-    
-    <section class="act" data-act>
-        <div class="act-inner">
-            <div class="act-title">ii. the sea</div>
-            where a fallen musician<br>
-            can only lament his failure.
-        </div>
-    </section>
-    
-    <section class="act" data-act>
-        <div class="act-inner">
-            <div class="act-title">iii. the mountain</div>
-            where a leader is powerless<br>
-            to save his people.
-        </div>
-    </section>
-    
-    <section class="act" data-act>
-        <div class="act-inner">
-            <div class="act-title">iv. the valley</div>
-            where the ghosts of the past<br>
-            still fight a war<br>
-            that has long since ended.
-        </div>
-    </section>
-    
-    <section class="act" data-act>
-        <div class="act-inner">
-            <div class="act-title">v. the town</div>
-            caught between it all,<br>
-            where the end begins.
-        </div>
-    </section>
-    
     <section id="candle-section" data-act>
         <div id="candle-prompt">light a candle</div>
         <div id="candle" onclick="lightCandle()">
@@ -479,15 +374,6 @@
         <input type="text" id="message-input" placeholder="..." maxlength="120">
         <button id="submit-btn" onclick="submitMessage()">offer</button>
         <div id="messages-display"></div>
-    </section>
-    
-    <section id="ending" data-act>
-        <div id="ending-text">
-            and one boy, a hero,<br>
-            with all the time in the world,<br>
-            and no time at all,<br>
-            to save this world.
-        </div>
     </section>
     
 </div>
